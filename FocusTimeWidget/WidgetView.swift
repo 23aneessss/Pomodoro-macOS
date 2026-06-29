@@ -25,16 +25,19 @@ struct WidgetView: View {
     }
 
     private var mediumWidget: some View {
-        HStack(spacing: 20) {
-            ring(size: 104)
+        HStack(spacing: 22) {
+            ring(size: 108, showTicks: true)
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text("FocusTime")
-                    .font(FocusTypography.label(size: 16, weight: .bold))
+                    .font(FocusTypography.label(size: 15, weight: .bold))
                     .foregroundStyle(FocusPalette.textPrimary)
+                    .padding(.bottom, 12)
 
                 statRow(label: "Today", value: FocusFormatters.shortDurationString(from: entry.snapshot.todaySeconds))
+                divider
                 statRow(label: "Sessions", value: "\(entry.snapshot.todaySessions)")
+                divider
                 statRow(label: "Streak", value: "\(entry.snapshot.streak)")
             }
 
@@ -44,19 +47,16 @@ struct WidgetView: View {
     }
 
     private var smallWidget: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("FocusTime")
-                .font(FocusTypography.label(size: 12, weight: .bold))
-                .foregroundStyle(FocusPalette.textPrimary)
+        ring(size: 110, showTicks: false)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(14)
+    }
 
-            Spacer(minLength: 8)
-
-            ring(size: 96)
-                .frame(maxWidth: .infinity, alignment: .center)
-
-            Spacer(minLength: 4)
-        }
-        .padding(16)
+    private var divider: some View {
+        Rectangle()
+            .fill(FocusPalette.surfaceStroke)
+            .frame(height: 1)
+            .padding(.vertical, 7)
     }
 
     private func statRow(label: String, value: String) -> some View {
@@ -74,13 +74,14 @@ struct WidgetView: View {
         }
     }
 
-    private func ring(size: CGFloat) -> some View {
+    private func ring(size: CGFloat, showTicks: Bool) -> some View {
         ZStack {
             RingView(
                 progress: entry.snapshot.ringProgress,
                 phase: entry.snapshot.phase,
-                lineWidth: size * 0.085,
-                animated: false
+                lineWidth: size * 0.08,
+                animated: false,
+                showTicks: showTicks
             )
             .frame(width: size, height: size)
 
