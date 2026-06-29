@@ -17,7 +17,7 @@ struct SettingsView: View {
 
             Section("Experience") {
                 Toggle("Play sound at session end", isOn: soundBinding)
-                Toggle("Reduce background motion", isOn: reduceMotionBinding)
+                Toggle("Reduce motion", isOn: reduceMotionBinding)
 
                 Picker("Window corner", selection: cornerBinding) {
                     ForEach(FocusCorner.allCases) { corner in
@@ -25,30 +25,10 @@ struct SettingsView: View {
                     }
                 }
             }
-
-            Section("Appearance") {
-                Picker("Background", selection: backgroundBinding) {
-                    ForEach(FocusBackgroundStyle.allCases) { style in
-                        Text(style.displayName).tag(style)
-                    }
-                }
-
-                Text("You can keep these built-in pixel backgrounds, or later add asset-catalog images with matching names and reuse this picker.")
-                    .font(FocusTypography.body(size: 11))
-                    .foregroundStyle(FocusPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Section("Notes") {
-                Text("FocusTime stays visible in the Dock for this first version. If you later want agent-style behavior with no Dock icon, add LSUIElement deliberately after the main workflow is stable.")
-                    .font(FocusTypography.body(size: 12))
-                    .foregroundStyle(FocusPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
         }
         .formStyle(.grouped)
         .padding(18)
-        .frame(minWidth: 430, minHeight: 320)
+        .frame(minWidth: 420, minHeight: 280)
     }
 
     private var focusMinutesBinding: Binding<Int> {
@@ -83,13 +63,6 @@ struct SettingsView: View {
         Binding(
             get: { viewModel.settings.preferredCorner },
             set: { viewModel.updatePreferredCorner($0) }
-        )
-    }
-
-    private var backgroundBinding: Binding<FocusBackgroundStyle> {
-        Binding(
-            get: { viewModel.settings.backgroundStyle },
-            set: { viewModel.updateBackgroundStyle($0) }
         )
     }
 
