@@ -16,6 +16,7 @@ enum FocusKeys {
     static let defaultFocusMinutes = 25
     static let defaultBreakMinutes = 5
     static let checkpointInterval = 60
+    static let sessionsPerCycle = 4
 }
 
 enum FocusWindowMetrics {

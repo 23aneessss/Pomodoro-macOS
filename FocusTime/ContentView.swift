@@ -6,29 +6,14 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             BackgroundView(phase: viewModel.phase)
-
             TimerView(viewModel: viewModel)
         }
         .frame(width: FocusWindowMetrics.defaultWidth, height: FocusWindowMetrics.defaultHeight)
         .clipShape(RoundedRectangle(cornerRadius: FocusWindowMetrics.panelCornerRadius, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: FocusWindowMetrics.panelCornerRadius, style: .continuous)
-                .stroke(FocusPalette.surfaceStroke, lineWidth: 1)
+                .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
         )
-        .shadow(color: FocusPalette.cardShadow, radius: 22, x: 0, y: 16)
-        .overlay(alignment: .topTrailing) {
-            SettingsLink {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(FocusPalette.textSecondary)
-                    .frame(width: 30, height: 30)
-                    .background(Circle().fill(FocusPalette.surface))
-                    .overlay(Circle().stroke(FocusPalette.surfaceStroke, lineWidth: 1))
-            }
-            .buttonStyle(PressableButtonStyle())
-            .accessibilityLabel("Open settings")
-            .padding(14)
-        }
         .ignoresSafeArea()
         .background(
             WindowAccessor { window in
@@ -38,7 +23,7 @@ struct ContentView: View {
     }
 }
 
-/// A calm dark gradient with a soft accent glow that tints with the current phase.
+/// A calm dark gradient with a restrained accent glow that tints with the phase.
 struct BackgroundView: View {
     var phase: TimerPhase
 
@@ -51,10 +36,10 @@ struct BackgroundView: View {
             )
 
             RadialGradient(
-                colors: [FocusPalette.accentSoft(for: phase), .clear],
-                center: .init(x: 0.5, y: 0.32),
-                startRadius: 8,
-                endRadius: 240
+                colors: [FocusPalette.accent(for: phase).opacity(0.14), .clear],
+                center: .init(x: 0.5, y: 0.30),
+                startRadius: 4,
+                endRadius: 260
             )
         }
         .animation(.easeInOut(duration: 0.5), value: phase)

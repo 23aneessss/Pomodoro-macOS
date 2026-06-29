@@ -49,22 +49,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settings = dataStore.loadSettings()
         let size = NSSize(width: FocusWindowMetrics.defaultWidth, height: FocusWindowMetrics.defaultHeight)
 
-        window.styleMask.insert(.fullSizeContentView)
-        window.setContentSize(size)
-        window.titleVisibility = .hidden
-        window.titlebarAppearsTransparent = true
+        // Borderless + locked min/max guarantees a pixel-perfect square with no
+        // titlebar strip; the rounded card is drawn entirely in SwiftUI.
+        window.styleMask = [.borderless, .fullSizeContentView]
         window.isMovableByWindowBackground = true
         window.level = .floating
         window.collectionBehavior.insert(.canJoinAllSpaces)
         window.backgroundColor = .clear
         window.isOpaque = false
-        if #available(macOS 11.0, *) {
-            window.titlebarSeparatorStyle = .none
-        }
-
-        [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton].forEach { buttonType in
-            window.standardWindowButton(buttonType)?.isHidden = true
-        }
+        window.hasShadow = true
+        window.contentMinSize = size
+        window.contentMaxSize = size
+        window.setContentSize(size)
 
         reposition(window: window, corner: settings.preferredCorner, animated: animated)
     }

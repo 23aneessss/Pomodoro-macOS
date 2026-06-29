@@ -55,6 +55,13 @@ final class FocusTimerViewModel: ObservableObject {
         FocusFormatters.shortDurationString(from: todayStats.seconds + pendingFocusSeconds)
     }
 
+    /// Number of filled dots (out of `sessionsPerCycle`) for the current pomodoro set.
+    var filledSessionDots: Int {
+        let completed = todayStats.sessions
+        guard completed > 0 else { return 0 }
+        return (completed - 1) % FocusKeys.sessionsPerCycle + 1
+    }
+
     var timerAccessibilityValue: String {
         let state = isRunning ? "running" : "paused"
         return "\(phase.title) timer, \(state), \(FocusFormatters.accessibilityDurationString(from: secondsRemaining)) remaining"
