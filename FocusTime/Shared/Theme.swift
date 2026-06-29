@@ -138,6 +138,40 @@ enum FocusPalette {
         }
     }
 
+    /// Two stacked hill tints (far, near) for the pixel landscape at the bottom of the sky.
+    static func hillColors(for style: FocusBackgroundStyle, phase: TimerPhase) -> (far: Color, near: Color) {
+        let night = phase == .break || style == .moonNight
+        if night {
+            return (
+                Color(red: 0.16, green: 0.15, blue: 0.30),
+                Color(red: 0.10, green: 0.10, blue: 0.22)
+            )
+        }
+
+        switch style {
+        case .blueSkies:
+            return (
+                Color(red: 0.36, green: 0.62, blue: 0.55),
+                Color(red: 0.22, green: 0.46, blue: 0.42)
+            )
+        case .peachSunset:
+            return (
+                Color(red: 0.62, green: 0.40, blue: 0.52),
+                Color(red: 0.44, green: 0.27, blue: 0.41)
+            )
+        case .candyClouds:
+            return (
+                Color(red: 0.74, green: 0.46, blue: 0.62),
+                Color(red: 0.58, green: 0.33, blue: 0.52)
+            )
+        case .moonNight:
+            return (
+                Color(red: 0.16, green: 0.15, blue: 0.30),
+                Color(red: 0.10, green: 0.10, blue: 0.22)
+            )
+        }
+    }
+
     static func cloudShadow(for style: FocusBackgroundStyle, phase: TimerPhase) -> Color {
         switch style {
         case .blueSkies:

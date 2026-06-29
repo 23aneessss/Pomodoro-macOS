@@ -25,24 +25,32 @@ struct TimerView: View {
             )
             .frame(width: 190, height: 190)
 
-            VStack(spacing: 8) {
-                Text(viewModel.phase.title.uppercased())
-                    .font(FocusTypography.pixel(size: 13))
-                    .foregroundStyle(FocusPalette.accent(for: viewModel.phase))
-                    .tracking(2.2)
+            Circle()
+                .fill(FocusPalette.centerFill(for: viewModel.phase).opacity(0.78))
+                .frame(width: 132, height: 132)
+                .overlay(
+                    Circle().stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
 
-                Text(viewModel.timeLabel)
-                    .font(FocusTypography.timer(size: 29))
-                    .monospacedDigit()
-                    .tracking(1.1)
-                    .minimumScaleFactor(0.72)
-                    .foregroundStyle(FocusPalette.timerText)
-                    .shadow(color: Color.black.opacity(0.38), radius: 0, x: 2, y: 2)
-                    .accessibilityLabel("Time remaining")
-                    .accessibilityValue(viewModel.timerAccessibilityValue)
+            VStack(spacing: 12) {
+                PixelTextView(
+                    text: viewModel.phase.title,
+                    cell: 2,
+                    color: FocusPalette.accent(for: viewModel.phase)
+                )
+
+                PixelTextView(
+                    text: viewModel.timeLabel,
+                    cell: 4,
+                    color: FocusPalette.timerText,
+                    shadow: FocusPalette.ringShadow(for: viewModel.phase)
+                )
             }
         }
         .frame(width: 190, height: 190)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Time remaining")
+        .accessibilityValue(viewModel.timerAccessibilityValue)
     }
 
     private var controlsDeck: some View {

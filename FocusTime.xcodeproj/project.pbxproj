@@ -49,22 +49,11 @@
 			);
 			target = 6CDC5D1972DE2CFAEDFD0BE4 /* FocusTimeWidget */;
 		};
-		6DDCF62C10A1B87D184C9A86 /* Exceptions for "FocusTime" folder in "FocusTime" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Agent/prompt.md,
-				Agent/searchReport.md,
-			);
-			target = 04EEC8C12F7858DB00A0CD63 /* FocusTime */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		04EEC8C42F7858DB00A0CD63 /* FocusTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				6DDCF62C10A1B87D184C9A86 /* Exceptions for "FocusTime" folder in "FocusTime" target */,
-			);
 			path = FocusTime;
 			sourceTree = "<group>";
 		};
