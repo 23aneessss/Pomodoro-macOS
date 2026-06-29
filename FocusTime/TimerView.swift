@@ -1,198 +1,120 @@
-import AppKit
 import SwiftUI
 
 struct TimerView: View {
     @ObservedObject var viewModel: FocusTimerViewModel
 
     var body: some View {
-        VStack(spacing: 22) {
+        VStack(spacing: 30) {
             timerCluster
-            controlsDeck
+            controls
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding(.horizontal, 24)
-        .padding(.vertical, 24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var timerCluster: some View {
         ZStack {
-            PixelRingView(
+            RingView(
                 progress: viewModel.progress,
                 phase: viewModel.phase,
-                segments: 42,
-                segmentLength: 16,
-                segmentThickness: 8
+                lineWidth: 13,
+                animated: !viewModel.settings.reduceMotion
             )
-            .frame(width: 190, height: 190)
+            .frame(width: 196, height: 196)
 
-            Circle()
-                .fill(FocusPalette.centerFill(for: viewModel.phase).opacity(0.78))
-                .frame(width: 132, height: 132)
-                .overlay(
-                    Circle().stroke(Color.white.opacity(0.06), lineWidth: 1)
-                )
+            VStack(spacing: 6) {
+                Text(viewModel.phase.title.uppercased())
+                    .font(FocusTypography.label(size: 11))
+                    .tracking(2.6)
+                    .foregroundStyle(FocusPalette.accent(for: viewModel.phase))
 
-            VStack(spacing: 12) {
-                PixelTextView(
-                    text: viewModel.phase.title,
-                    cell: 2,
-                    color: FocusPalette.accent(for: viewModel.phase)
-                )
+                Text(viewModel.timeLabel)
+                    .font(FocusTypography.timer(size: 48))
+                    .monospacedDigit()
+                    .foregroundStyle(FocusPalette.textPrimary)
+                    .contentTransition(.numericText())
 
-                PixelTextView(
-                    text: viewModel.timeLabel,
-                    cell: 4,
-                    color: FocusPalette.timerText,
-                    shadow: FocusPalette.ringShadow(for: viewModel.phase)
-                )
+                Text(viewModel.todayFocusLabel + " today")
+                    .font(FocusTypography.body(size: 11, weight: .medium))
+                    .foregroundStyle(FocusPalette.textSecondary)
+                    .padding(.top, 2)
             }
         }
-        .frame(width: 190, height: 190)
+        .frame(width: 196, height: 196)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Time remaining")
         .accessibilityValue(viewModel.timerAccessibilityValue)
     }
 
-    private var controlsDeck: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 16) {
-                Button(action: viewModel.resetTimer) {
-                    PixelAssetButtonLabel(
-                        assetNames: breakAwareAssetNames(base: "ButtonRestart"),
-                        fallbackTitle: "Restart",
-                        kind: .secondary,
-                        phase: viewModel.phase,
-                        width: 42,
-                        height: 42
-                    )
-                }
-                .accessibilityLabel("Restart timer")
-                .buttonStyle(.plain)
+    private var controls: some View {
+        HStack(spacing: 26) {
+            SecondaryControlButton(
+                systemName: "arrow.counterclockwise",
+                accessibilityLabel: "Restart timer",
+                action: viewModel.resetTimer
+            )
 
-                Button(action: viewModel.toggleTimer) {
-                    PixelAssetButtonLabel(
-                        assetNames: primaryActionAssetNames,
-                        fallbackTitle: viewModel.primaryActionLabel,
-                        kind: .primary,
-                        phase: viewModel.phase,
-                        width: 144,
-                        height: 42
-                    )
-                }
-                .accessibilityLabel(viewModel.primaryActionLabel)
-                .buttonStyle(.plain)
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
+            PrimaryControlButton(
+                isRunning: viewModel.isRunning,
+                phase: viewModel.phase,
+                action: viewModel.toggleTimer
+            )
 
-            Button(action: viewModel.skipPhase) {
-                PixelAssetButtonLabel(
-                    assetNames: breakAwareAssetNames(base: "ButtonSkip"),
-                    fallbackTitle: "Skip",
-                    kind: .secondary,
-                    phase: viewModel.phase,
-                    width: 100,
-                    height: 38
-                )
-            }
-            .accessibilityLabel("Skip to next phase")
-            .buttonStyle(.plain)
+            SecondaryControlButton(
+                systemName: "forward.fill",
+                accessibilityLabel: "Skip to next phase",
+                action: viewModel.skipPhase
+            )
         }
-        .frame(width: 202)
-    }
-
-    private var primaryActionAssetNames: [String] {
-        let base = viewModel.isRunning ? "ButtonPause" : "ButtonStart"
-        return breakAwareAssetNames(base: base)
-    }
-
-    private func breakAwareAssetNames(base: String) -> [String] {
-        if viewModel.phase == .break {
-            return ["\(base)Break", base]
-        }
-
-        return [base]
     }
 }
 
-private enum PixelButtonKind {
-    case primary
-    case secondary
-}
-
-private struct PixelAssetButtonLabel: View {
-    let assetNames: [String]
-    let fallbackTitle: String
-    let kind: PixelButtonKind
+private struct PrimaryControlButton: View {
+    let isRunning: Bool
     let phase: TimerPhase
-    let width: CGFloat
-    let height: CGFloat
+    let action: () -> Void
 
     var body: some View {
-        Group {
-            if let resolvedAssetName = resolvedAssetName {
-                Image(resolvedAssetName)
-                    .resizable()
-                    .interpolation(.none)
-                    .antialiased(false)
-                    .scaledToFit()
-                    .frame(width: width, height: height)
-            } else {
-                fallbackLabel
-                    .frame(width: width, height: height)
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: FocusPalette.accentGradient(for: phase),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 68, height: 68)
+                    .shadow(color: FocusPalette.accent(for: phase).opacity(0.45), radius: 12, x: 0, y: 6)
+
+                Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundStyle(.white)
+                    .offset(x: isRunning ? 0 : 2)
+                    .contentTransition(.symbolEffect(.replace))
             }
         }
-        .contentShape(Rectangle())
-        .scaleEffect(0.995)
+        .buttonStyle(PressableButtonStyle())
+        .accessibilityLabel(isRunning ? "Pause" : "Start")
     }
+}
 
-    private var resolvedAssetName: String? {
-        assetNames.first { NSImage(named: NSImage.Name($0)) != nil }
-    }
+private struct SecondaryControlButton: View {
+    let systemName: String
+    let accessibilityLabel: String
+    let action: () -> Void
 
-    private var fallbackLabel: some View {
-        Text(fallbackTitle)
-            .font(FocusTypography.pixel(size: kind == .primary ? 13 : 11))
-            .foregroundStyle(kind == .primary ? Color.white : FocusPalette.chrome)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: kind == .primary ? 16 : 12, style: .continuous)
-                    .fill(backgroundColor)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: kind == .primary ? 16 : 12, style: .continuous)
-                    .stroke(borderColor, lineWidth: 1)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: kind == .primary ? 12 : 9, style: .continuous)
-                    .stroke(highlightColor.opacity(0.75), lineWidth: 1)
-                    .padding(3)
-            )
-    }
-
-    private var backgroundColor: Color {
-        switch kind {
-        case .primary:
-            return FocusPalette.accent(for: phase)
-        case .secondary:
-            return Color.white.opacity(0.92)
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(FocusPalette.textPrimary)
+                .frame(width: 48, height: 48)
+                .background(Circle().fill(FocusPalette.surface))
+                .overlay(Circle().stroke(FocusPalette.surfaceStroke, lineWidth: 1))
         }
-    }
-
-    private var borderColor: Color {
-        switch kind {
-        case .primary:
-            return FocusPalette.accent(for: phase).opacity(0.7)
-        case .secondary:
-            return FocusPalette.panelStroke
-        }
-    }
-
-    private var highlightColor: Color {
-        switch kind {
-        case .primary:
-            return FocusPalette.ringHighlight(for: phase)
-        case .secondary:
-            return Color.white
-        }
+        .buttonStyle(PressableButtonStyle())
+        .accessibilityLabel(accessibilityLabel)
     }
 }
