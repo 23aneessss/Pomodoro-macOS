@@ -22,42 +22,6 @@ enum FocusCorner: String, CaseIterable, Codable, Identifiable {
     }
 }
 
-enum FocusBackgroundStyle: String, CaseIterable, Codable, Identifiable {
-    case blueSkies
-    case peachSunset
-    case candyClouds
-    case moonNight
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .blueSkies:
-            return "Blue Skies"
-        case .peachSunset:
-            return "Peach Sunset"
-        case .candyClouds:
-            return "Candy Clouds"
-        case .moonNight:
-            return "Moon Night"
-        }
-    }
-
-    // If you later add asset-catalog images with these names, the app will use them automatically.
-    var assetName: String {
-        switch self {
-        case .blueSkies:
-            return "BackgroundBlueSkies"
-        case .peachSunset:
-            return "BackgroundPeachSunset"
-        case .candyClouds:
-            return "BackgroundCandyClouds"
-        case .moonNight:
-            return "BackgroundMoonNight"
-        }
-    }
-}
-
 enum TimerPhase: String, CaseIterable, Codable, Identifiable {
     case focus
     case `break`
@@ -98,7 +62,6 @@ struct FocusSettings: Codable, Hashable {
     var soundEnabled: Bool
     var reduceMotion: Bool
     var preferredCorner: FocusCorner
-    var backgroundStyle: FocusBackgroundStyle
 
     private enum CodingKeys: String, CodingKey {
         case focusDuration
@@ -106,7 +69,6 @@ struct FocusSettings: Codable, Hashable {
         case soundEnabled
         case reduceMotion
         case preferredCorner
-        case backgroundStyle
     }
 
     static let `default` = FocusSettings(
@@ -114,8 +76,7 @@ struct FocusSettings: Codable, Hashable {
         breakDuration: FocusKeys.defaultBreakMinutes * 60,
         soundEnabled: true,
         reduceMotion: false,
-        preferredCorner: .topRight,
-        backgroundStyle: .blueSkies
+        preferredCorner: .topRight
     )
 
     init(
@@ -123,15 +84,13 @@ struct FocusSettings: Codable, Hashable {
         breakDuration: Int,
         soundEnabled: Bool,
         reduceMotion: Bool,
-        preferredCorner: FocusCorner,
-        backgroundStyle: FocusBackgroundStyle
+        preferredCorner: FocusCorner
     ) {
         self.focusDuration = focusDuration
         self.breakDuration = breakDuration
         self.soundEnabled = soundEnabled
         self.reduceMotion = reduceMotion
         self.preferredCorner = preferredCorner
-        self.backgroundStyle = backgroundStyle
     }
 
     init(from decoder: Decoder) throws {
@@ -141,7 +100,6 @@ struct FocusSettings: Codable, Hashable {
         soundEnabled = try container.decodeIfPresent(Bool.self, forKey: .soundEnabled) ?? FocusSettings.default.soundEnabled
         reduceMotion = try container.decodeIfPresent(Bool.self, forKey: .reduceMotion) ?? FocusSettings.default.reduceMotion
         preferredCorner = try container.decodeIfPresent(FocusCorner.self, forKey: .preferredCorner) ?? FocusSettings.default.preferredCorner
-        backgroundStyle = try container.decodeIfPresent(FocusBackgroundStyle.self, forKey: .backgroundStyle) ?? .blueSkies
     }
 
     func encode(to encoder: Encoder) throws {
@@ -151,7 +109,6 @@ struct FocusSettings: Codable, Hashable {
         try container.encode(soundEnabled, forKey: .soundEnabled)
         try container.encode(reduceMotion, forKey: .reduceMotion)
         try container.encode(preferredCorner, forKey: .preferredCorner)
-        try container.encode(backgroundStyle, forKey: .backgroundStyle)
     }
 
     var focusMinutes: Int {
@@ -170,7 +127,6 @@ struct FocusWidgetSnapshot: Codable, Hashable {
     var streak: Int
     var focusDuration: Int
     var phase: TimerPhase
-    var backgroundStyle: FocusBackgroundStyle
 
     var ringProgress: Double {
         guard focusDuration > 0 else { return 0 }
@@ -183,7 +139,6 @@ struct FocusWidgetSnapshot: Codable, Hashable {
         todaySessions: 3,
         streak: 6,
         focusDuration: FocusKeys.defaultFocusMinutes * 60,
-        phase: .focus,
-        backgroundStyle: .blueSkies
+        phase: .focus
     )
 }

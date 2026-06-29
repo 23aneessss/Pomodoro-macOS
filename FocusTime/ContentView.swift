@@ -2,56 +2,61 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: FocusTimerViewModel
-    private let settingsInset: CGFloat = 12
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: FocusWindowMetrics.panelCornerRadius, style: .continuous)
-                .fill(FocusPalette.chrome)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            PixelBackgroundView(
-                phase: viewModel.phase,
-                reduceMotion: viewModel.settings.reduceMotion,
-                style: viewModel.settings.backgroundStyle
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            BackgroundView(phase: viewModel.phase)
 
             TimerView(viewModel: viewModel)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(width: FocusWindowMetrics.defaultWidth, height: FocusWindowMetrics.defaultHeight)
         .clipShape(RoundedRectangle(cornerRadius: FocusWindowMetrics.panelCornerRadius, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: FocusWindowMetrics.panelCornerRadius, style: .continuous)
-                .stroke(FocusPalette.chromeBorder.opacity(0.55), lineWidth: 1)
+                .stroke(FocusPalette.surfaceStroke, lineWidth: 1)
         )
-        .shadow(color: FocusPalette.cardShadow, radius: 18, x: 0, y: 14)
-        .ignoresSafeArea()
+        .shadow(color: FocusPalette.cardShadow, radius: 22, x: 0, y: 16)
         .overlay(alignment: .topTrailing) {
             SettingsLink {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(FocusPalette.textPrimary)
-                    .padding(9)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(Color.black.opacity(0.26))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(FocusPalette.chromeBorder.opacity(0.55), lineWidth: 1)
-                    )
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(FocusPalette.textSecondary)
+                    .frame(width: 30, height: 30)
+                    .background(Circle().fill(FocusPalette.surface))
+                    .overlay(Circle().stroke(FocusPalette.surfaceStroke, lineWidth: 1))
             }
+            .buttonStyle(PressableButtonStyle())
             .accessibilityLabel("Open settings")
-            .buttonStyle(.plain)
-            .padding(.top, settingsInset)
-            .padding(.trailing, settingsInset)
+            .padding(14)
         }
+        .ignoresSafeArea()
         .background(
             WindowAccessor { window in
                 AppDelegate.shared?.registerMainWindow(window)
             }
         )
+    }
+}
+
+/// A calm dark gradient with a soft accent glow that tints with the current phase.
+struct BackgroundView: View {
+    var phase: TimerPhase
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [FocusPalette.backgroundTop, FocusPalette.backgroundBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+
+            RadialGradient(
+                colors: [FocusPalette.accentSoft(for: phase), .clear],
+                center: .init(x: 0.5, y: 0.32),
+                startRadius: 8,
+                endRadius: 240
+            )
+        }
+        .animation(.easeInOut(duration: 0.5), value: phase)
     }
 }

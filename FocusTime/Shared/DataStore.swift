@@ -76,8 +76,7 @@ final class DataStore {
                 todaySessions: today.sessions,
                 streak: streak,
                 focusDuration: settings.focusDuration,
-                phase: phase,
-                backgroundStyle: settings.backgroundStyle
+                phase: phase
             )
         }
     }

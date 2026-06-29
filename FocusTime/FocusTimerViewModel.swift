@@ -114,10 +114,6 @@ final class FocusTimerViewModel: ObservableObject {
         mutateSettings { $0.preferredCorner = corner }
     }
 
-    func updateBackgroundStyle(_ style: FocusBackgroundStyle) {
-        mutateSettings { $0.backgroundStyle = style }
-    }
-
     private func mutateSettings(_ mutation: (inout FocusSettings) -> Void) {
         var updated = settings
         mutation(&updated)
